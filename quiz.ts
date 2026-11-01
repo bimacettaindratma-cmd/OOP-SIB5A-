@@ -1,81 +1,126 @@
+// =====================================================================
+//  SOAL: Mario Bros dengan OOP (TypeScript)
+// =====================================================================
+//  Mario memiliki atribut: HP, speed, positionX, positionY, invincible,
+//  currentForm. Mario dapat berubah menjadi 3 form: 'mario',
+//  'super mario', dan 'fire mario'.
+//
+//  Default: HP = 1, speed = 5, currentForm = 'mario', invincible = false,
+//           positionX = 0, positionY = 0
+//
+//  1. SuperMushroom (Jamur): Mario menjadi Super Mario, HP + 1.
+//  2. FireFlower (Bunga): Mario menjadi Fire Mario, HP + 1,
+//     dan dapat menembakkan bola api.
+//  3. SuperStar (Bintang): Mario kebal terhadap serangan.
+//  4. Diserang: HP - 1 dan kembali ke form 'mario'.
+//     Jika sedang kebal, serangan tidak berpengaruh.
+//  5. Bergerak ke kanan: positionX + speed.
+//  6. Bergerak ke kiri: positionX - speed.
+//
+//  Buat class, attribute, method, dan object.
+//  Terapkan inheritance dan polymorphism.
+// =====================================================================
+
+// Kerjakan Quiznya Disini
+
 class Mario {
-  constructor(
-    public HP: number = 1,
-    public speed: number = 5,
-    public currentForm: 'mario' | 'super mario' | 'fire mario' = 'mario',
-    public invincible: boolean = false,
-    public positionX: number = 0,
-    public positionY: number = 0
-  ) {}
+  hp: number = 1;
+  speed: number = 5;
+  positionX: number = 0;
+  positionY: number = 0;
+  invincible: boolean = false;
+  currentForm: string = "mario";
 
-  superMushroom(): void {
-    this.currentForm = 'super mario';
-    this.HP++;
-    console.log(`Mario mengambil SuperMushroom dan berubah menjadi ${this.currentForm} (HP: ${this.HP})`);
+  moveRight(): void {
+    this.positionX += this.speed;
+    console.log(`${this.currentForm} bergerak ke kanan, posisi X sekarang ${this.positionX}.`);
   }
 
-  fireFlower(): void {
-    this.currentForm = 'fire mario';
-    this.HP++;
-    console.log(`Mario mengambil FireFlower dan berubah menjadi ${this.currentForm} (HP: ${this.HP})`);
+  moveLeft(): void {
+    this.positionX -= this.speed;
+    console.log(`${this.currentForm} bergerak ke kiri, posisi X sekarang ${this.positionX}.`);
   }
 
-  tembakBolaApi(): void {
-    if (this.currentForm === 'fire mario') {
-      console.log(`${this.currentForm} menembakkan bola api!`);
+  getAttacked(): void {
+    if (this.invincible) {
+      console.log("Mario diserang musuh, tetapi sedang kebal sehingga serangan tidak berpengaruh.");
+      return;
+    }
+    const FormSebelumnya = this.currentForm
+    this.hp -= 1;
+    this.currentForm = "mario";
+
+    if (this.hp <= 0) {
+      console.log(`${FormSebelumnya} diserang musuh, HP habis. GAME OVER!`);
     } else {
-      console.log(`${this.currentForm} tidak dapat menembakkan bola api.`);
+      console.log(`${FormSebelumnya} diserang musuh, HP menjadi ${this.hp} dan wujud sekarang ${this.currentForm}.`);
     }
   }
 
-  superStar(): void {
-    this.invincible = true;
-    console.log(`Mario mengambil SuperStar dan sekarang kebal terhadap serangan!`);
-  }
-
-  diserang(): void {
-    if (this.invincible === true) {
-      console.log(`Mario diserang, tetapi sedang kebal sehingga serangan tidak berpengaruh.`);
+  TembakBolaApi(): void {
+    if (this.currentForm === "fire mario") {
+      console.log(`fire mario menembakkan bola api.`);
     } else {
-      this.HP--;
-      this.currentForm = 'mario';
-      console.log(`Mario diserang! Kembali ke form ${this.currentForm} (HP: ${this.HP})`);
+      console.log(`${this.currentForm} belum bisa menembak, butuh Bunga Api.`);
     }
   }
+}
 
-  bergerakKanan(): void {
-    this.positionX = this.positionX + this.speed;
-    console.log(`Mario bergerak ke kanan (positionX: ${this.positionX})`);
+// induk dari semua item
+class Item {
+  use(mario: Mario): void {}
+}
+
+class SuperMushroom extends Item {
+  use(mario: Mario): void {
+    mario.currentForm = "super mario";
+    mario.hp += 1;
+    console.log(`Mario memakan Jamur Ajaib, wujud sekarang ${mario.currentForm} dan HP menjadi ${mario.hp}.`);
   }
+}
 
-  bergerakKiri(): void {
-    this.positionX = this.positionX - this.speed;
-    console.log(`Mario bergerak ke kiri (positionX: ${this.positionX})`);
+class FireFlower extends Item {
+  use(mario: Mario): void {
+    mario.currentForm = "fire mario";
+    mario.hp += 1;
+    console.log(`Mario mengambil Bunga Api, wujud sekarang ${mario.currentForm} dan HP menjadi ${mario.hp}.`);
   }
 }
 
-class SuperMario extends Mario {
-  constructor() { super(2, 5, 'super mario'); }
-  tembakBolaApi(): void { console.log(`Super Mario belum bisa menembakkan bola api.`); }
+class SuperStar extends Item {
+  use(mario: Mario): void {
+    mario.invincible = true;
+    console.log("Mario menyentuh Bintang, tubuhnya bersinar dan kebal terhadap serangan.");
+  }
 }
 
-class FireMario extends Mario {
-  constructor() { super(2, 5, 'fire mario'); }
-  tembakBolaApi(): void { console.log(`Fire Mario menembakkan bola api!`); }
-}
+// object
+const mario = new Mario();
+const mushroom = new SuperMushroom();
+const flower = new FireFlower();
+const star = new SuperStar();
 
-const player = new Mario();
-player.superMushroom();
-player.fireFlower();
-player.tembakBolaApi();
-player.bergerakKanan();
-player.bergerakKiri();
-player.diserang();
-player.superStar();
-player.diserang();
+const mario2 = new Mario();
 
-let karakter: Mario;
-karakter = new SuperMario();
-karakter.tembakBolaApi();
-karakter = new FireMario();
-karakter.tembakBolaApi();
+console.log("---------------")
+mario.TembakBolaApi();
+mario.moveRight();
+mushroom.use(mario);
+mario.getAttacked();
+mario.TembakBolaApi();
+
+console.log("------------------")
+const mario3 = new Mario();
+mushroom.use(mario3);
+mario3.moveRight();
+mushroom.use(mario3)
+mario3.TembakBolaApi();
+flower.use(mario3);
+mario3.TembakBolaApi();
+mario3.getAttacked();
+mario3.getAttacked();
+console.log("------------")
+
+
+
+
